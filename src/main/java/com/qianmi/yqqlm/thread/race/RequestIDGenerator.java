@@ -18,6 +18,14 @@ public class RequestIDGenerator implements CircularSeqGenerator {
     private final static RequestIDGenerator INSTANCE = new RequestIDGenerator();
     private final static short SEQ_UPPER_LIMIT = 999;
 
+    /**
+     * 状态变量
+     * - 类的实例变量、静态变量
+     * 共享变量
+     * - 可以被多个线程共同访问的变量
+     * 局部变量
+     * - 不会导致竞态
+     */
     private short sequence = -1;
 
 
@@ -34,6 +42,7 @@ public class RequestIDGenerator implements CircularSeqGenerator {
         return INSTANCE;
     }
 
+
     public String nextID() {
         SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
         DecimalFormat df = new DecimalFormat("000");
@@ -43,11 +52,20 @@ public class RequestIDGenerator implements CircularSeqGenerator {
         return sj.toString();
     }
 
+
+    /**
+     * TODO: 保证线程安全
+     * - synchronized关键字
+     *
+     * @return 序列号
+     */
     @Override
     public short nextSequence() {
+        // check-then-act
         if (sequence >= SEQ_UPPER_LIMIT) {
             return 0;
         } else {
+            // read-modify-write
             sequence++;
         }
         return sequence;
